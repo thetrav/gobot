@@ -14,7 +14,11 @@ import (
 	"github.com/g3n/engine/renderer"
 	"github.com/g3n/engine/util/helper"
 	"github.com/g3n/engine/window"
+	"github.com/g3n/engine/loader/obj"
 	"time"
+	"fmt"
+	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -46,17 +50,19 @@ func main() {
 	onResize("", nil)
 
 	// Create a blue torus and add it to the scene
-	geom := geometry.NewTorus(1, .4, 12, 32, math32.Pi*2)
-	mat := material.NewStandard(math32.NewColor("DarkBlue"))
-	mesh := graphic.NewMesh(geom, mat)
-	scene.Add(mesh)
+	// addTorus(scene)
+	err := addModel(scene, "../assets/kenney/space_kit2/alien.obj")
+	if err != nil {
+		panic(err)
+	}
 
 	// Create and add a button to the scene
 	btn := gui.NewButton("Make Red")
 	btn.SetPosition(100, 40)
 	btn.SetSize(40, 40)
 	btn.Subscribe(gui.OnClick, func(name string, ev interface{}) {
-		mat.SetColor(math32.NewColor("DarkRed"))
+		// mat.SetColor(math32.NewColor("DarkRed"))
+		fmt.Printf("click!")
 	})
 	scene.Add(btn)
 
@@ -77,4 +83,44 @@ func main() {
 		a.Gls().Clear(gls.DEPTH_BUFFER_BIT | gls.STENCIL_BUFFER_BIT | gls.COLOR_BUFFER_BIT)
 		renderer.Render(scene, cam)
 	})
+}
+
+func addTorus(node *core.Node) {
+	geom := geometry.NewTorus(1, .4, 12, 32, math32.Pi*2)
+	mat := material.NewStandard(math32.NewColor("DarkBlue"))
+	mesh := graphic.NewMesh(geom, mat)
+	node.Add(mesh)
+}
+
+func addModel(node *core.Node, path string) error {
+	model, err := openModel(path)
+	if err != nil {
+		return err
+	}
+	node.Add(model)
+	return nil
+}
+
+// openModel try to open the specified model and add it to the scene
+func openModel(fpath string) (*core.Node, error) {
+
+	dir, file := filepath.Split(fpath)
+	ext := filepath.Ext(file)
+	if ext == ".obj" {
+		// Checks for material file in the same dir
+		matfile := file[:len(file)-len(ext)]
+		matpath := filepath.Join(dir, matfile)
+		_, err := os.Stat(matpath)
+		if err != nil {
+			matpath = ""
+		}
+		dec, err := obj.Decode(fpath, matpath)
+		if err != nil {
+			return nil, err
+		}
+
+		return dec.NewGroup()
+		
+	}
+	return nil, fmt.Errorf("Unrecognized model file extension:[%s]", ext)
 }
