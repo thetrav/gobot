@@ -1,29 +1,27 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/g3n/engine/app"
 	"github.com/g3n/engine/camera"
 	"github.com/g3n/engine/core"
-	"github.com/g3n/engine/geometry"
 	"github.com/g3n/engine/gls"
-	"github.com/g3n/engine/graphic"
 	"github.com/g3n/engine/gui"
 	"github.com/g3n/engine/light"
-	"github.com/g3n/engine/material"
+	"github.com/g3n/engine/loader/obj"
 	"github.com/g3n/engine/math32"
 	"github.com/g3n/engine/renderer"
 	"github.com/g3n/engine/util/helper"
 	"github.com/g3n/engine/window"
-	"github.com/g3n/engine/loader/obj"
-	"time"
-	"fmt"
-	"os"
-	"path/filepath"
 )
 
 type App struct {
 	*app.Application
-	scene *core.Node
+	scene  *core.Node
 	camera *camera.Camera
 }
 
@@ -121,7 +119,7 @@ func openModel(fpath string) (*core.Node, error) {
 		}
 
 		return dec.NewGroup()
-		
+
 	}
 	return nil, fmt.Errorf("Unrecognized model file extension:[%s]", ext)
 }
