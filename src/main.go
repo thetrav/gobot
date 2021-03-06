@@ -51,16 +51,30 @@ func (a *App) createScene() {
 	a.Subscribe(window.OnWindowSize, onResize)
 	onResize("", nil)
 
-	err := addModel(a.scene, "../assets/kenney/space_kit2/alien.obj")
+	var err error
+
+	err = addModel(a.scene, "../assets/kenney/space_kit2/alien.obj")
 	if err != nil {
 		panic(err)
 	}
 
+	err = addModel(a.scene, "../assets/levels/level1a.obj")
+	if err != nil {
+		panic(err)
+	}
+
+	
+
 	// Create and add lights to the scene
-	a.scene.Add(light.NewAmbient(&math32.Color{1.0, 1.0, 1.0}, 3.0))
-	pointLight := light.NewPoint(&math32.Color{1, 1, 1}, 5.0)
-	pointLight.SetPosition(1, 0, 2)
-	a.scene.Add(pointLight)
+	a.scene.Add(light.NewAmbient(&math32.Color{1.0, 1.0, 1.0}, 0.5))
+	sunlight := light.NewDirectional(&math32.Color{1.0, 1.0, 1.0}, 0.5)
+	sunlight.SetPosition(0, 1, 0)
+	sunlight.SetDirection(-0.1,-1, -0.3)
+	a.scene.Add(sunlight)
+
+	// pointLight := light.NewDirection(&math32.Color{1, 1, 1}, 5.0)
+	// pointLight.SetPosition(1, 1, 2)
+	// a.scene.Add(pointLight)
 
 	// Create and add an axis helper to the scene
 	a.scene.Add(helper.NewAxes(0.5))
